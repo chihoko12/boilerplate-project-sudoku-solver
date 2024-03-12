@@ -11,27 +11,36 @@ module.exports = function (app) {
       const { puzzle, coordinate, value } = req.body;
       if (!puzzle || !coordinate || !value) {
         return res.json({ error: 'Required field(s) missing' });
-      }
-
-      const row = parseInt(coordinate.charAt(0)) - 1;
-      const col = coordinate.charAt(1).toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0);
-
-      if (row < 0 || row > 8 || col < 0 || col > 8) {
+      } else if (!/^[a-iA-I][1-9]$/.test(coordinate)) {
         return res.json({ error: 'Invalid coordinate' });
-      }
-
-      if (!/^[1-9]$/.test(value)) {
+      } else if (!/^[1-9]$/.test(value)) {
         return res.json({ error: 'Invalid value' });
-      }
+      } else if (solver.validate(puzzle) === true) {
 
-      const isValidRow = solver.checkRowPlacement(puzzle, row, col, value);
-      const isValidCol = solver.checkColPlacement(puzzle, row, col, value);
-      const isValidRegion = solver.checkRegionPlacement(puzzle, row, col, value);
+        const col = parseInt(coordinate[1]) - 1;
 
-      if (isValidRow && isValidCol && isValidRegion) {
+        const isValidPlacement = solver.checkRowPlacement(puzzle, row, col, value) &&
+          solver.checkColPlacement(puzzle, row, col, value) &&
+          solver.checkRegionPlacement(puzzle, row, col, value);
+
+        if (!isValidPlacement) {
+          return res.json({ valid: false });
+        }
         return res.json({ valid: true });
+
+        // const isValidRow = solver.checkRowPlacement(puzzle, row, col, value);
+        // const isValidCol = solver.checkColPlacement(puzzle, row, col, value);
+        // const isValidRegion = solver.checkRegionPlacement(puzzle, row, col, value);
+
+        // if (isValidRow && isValidCol && isValidRegion) {
+        //   return res.json({ valid: true });
+        // } else {
+        //   return res.json({ valid: false, conflict: ['row', 'column', 'region'].filter((type) => !solver[`check${type.charAt(0).toUpperCase()}${type.slice(1)}Placement`](puzzle, row, col,value)) });
+        // }
+
+
       } else {
-        return res.json({ valid: false, conflict: ['row', 'column', 'region'].filter((type) => !solver[`check${type.charAt(0).toUpperCase()}${type.slice(1)}Placement`](puzzle, row, col,value)) });
+        res.json({ error: 'Invalid puzzle'})
       }
 
     });
@@ -41,13 +50,18 @@ module.exports = function (app) {
       const { puzzle } = req.body;
       if (!puzzle) {
         return res.json({ error: 'Required field missing' });
+      } else if (solver.validate(puzzle) === true) {
+        res.json(solver.solve(puzzle));
+      } else {
+        res.json({ error: 'Invalid puzzle' })
       }
 
       const result = solver.solve(puzzle);
-      if (result.error) {
-        return res.json(result);
-      }
       return res.json(result);
+      // if (result.error) {
+      //   return res.json(result);
+      // }
+      // return res.json(result);
 
     });
 };
