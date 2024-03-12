@@ -18,6 +18,7 @@ module.exports = function (app) {
       } else if (solver.validate(puzzle) === true) {
 
         const col = parseInt(coordinate[1]) - 1;
+        const val = parseInt(value);
 
         const isValidPlacement = solver.checkRowPlacement(puzzle, row, col, value) &&
           solver.checkColPlacement(puzzle, row, col, value) &&
@@ -57,11 +58,11 @@ module.exports = function (app) {
       }
 
       const result = solver.solve(puzzle);
-      return res.json(result);
-      // if (result.error) {
-      //   return res.json(result);
-      // }
       // return res.json(result);
+      if (result.error) {
+        return res.json(result);
+      }
+      return res.json(result);
 
     });
 };

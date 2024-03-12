@@ -18,15 +18,22 @@ class SudokuSolver {
   }
 
   checkRowPlacement(puzzleString, row, column, value) {
-    if (puzzleString[this.convertRowToNum(row) * 9 + column === value]) {
+    //console.log(`this.convertRowToNum(row) * 9 + column: ${this.convertRowToNum(row) * 9 + column}`);
+    //console.log(`puzzleString: ${this.convertRowToNum(row) * 9 + column == value}`);
+    //console.log(`puzzleString: ${puzzleString[this.convertRowToNum(row) * 9 + column] == value}`);
+
+    if (puzzleString[this.convertRowToNum(row) * 9 + column] == value) {
       return true;
     }
 
-    const rowStart = this.convertRowToNum[row] * 9;
+    const rowStart = this.convertRowToNum(row) * 9;
     const rowEnd = rowStart + 9;
 
     const rowValues = puzzleString.slice(rowStart, rowEnd).split('');
-    return !rowValues.includes(value);
+    // console.log(`row: ${row}, column: ${column}, value: ${value}, rowStart: ${rowStart} ,rowValues: ${rowValues}`);
+    //console.log(`row: ${typeof(row)}, column: ${typeof(column)}, value: ${typeof(value)}, rowStart: ${typeof(rowStart)} ,rowValues: ${Array.isArray(rowValues)}`);
+    //console.log(`value: ${value} ,rowValues: ${rowValues} ---- includes: ${rowValues.includes(value.toString())}`);
+    return !rowValues.includes(value.toString());
   }
 
   checkColPlacement(puzzleString, row, column, value) {
