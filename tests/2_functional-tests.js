@@ -57,7 +57,7 @@ suite('Functional Tests', () => {
   });
 
   test('Solve a puzzle that cannot be solved: POST request to /api/solve', (done) => {
-    let puzzle = puzzles.puzzlesAndSolutions[0][0].replace(/^.{2}/g, '12');
+    let puzzle = puzzles.puzzlesAndSolutions[0][0].replace(/^.{3}/g, '123');
     chai.request(server)
       .post('/api/solve')
       .send({ puzzle: puzzle })
@@ -108,7 +108,7 @@ suite('Functional Tests', () => {
         assert.isFalse(res.body.valid);
         assert.property(res.body, 'conflict');
         assert.isArray(res.body.conflict);
-        assert.lengthOf(res.body.conflict, 3);
+        assert.lengthOf(res.body.conflict, 2);
         done();
       });
   });
@@ -117,14 +117,14 @@ suite('Functional Tests', () => {
     let puzzle = puzzles.puzzlesAndSolutions[0][0];
     chai.request(server)
       .post('/api/check')
-      .send({ puzzle: puzzle, coordinate: 'B2', value: '2' })
+      .send({ puzzle: puzzle, coordinate: 'A2', value: '2' })
       .end((err, res) => {
         assert.equal(res.status, 200);
         assert.property(res.body, 'valid');
         assert.isFalse(res.body.valid);
         assert.property(res.body, 'conflict');
         assert.isArray(res.body.conflict);
-        assert.lengthOf(res.body.conflict, 27);
+        assert.lengthOf(res.body.conflict, 3);
         done();
       });
   });

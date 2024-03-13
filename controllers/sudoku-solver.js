@@ -105,6 +105,7 @@ class SudokuSolver {
         puzzleArray[emptyIndex] = '';
       }
     }
+    return false;
   }
 }
 
