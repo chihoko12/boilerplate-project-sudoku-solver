@@ -5,7 +5,7 @@ class SudokuSolver {
     let rowNum;
 
     if (/^[a-iA-I]$/.test(rowStr)) {
-      rowNum = rowToNum[rowStr.toLowerCase()];
+      rowNum = rowToNum[rowStr];
     } else {
       rowNum = rowStr;
     }
@@ -14,14 +14,16 @@ class SudokuSolver {
 
 
   validate(puzzleString) {
-    return /^[1-9\.]{81}$/.test(puzzleString);
+    if (!/^.{81}$/.test(puzzleString)) {
+      return { error: 'Expected puzzle to be 81 characters long' }
+    }
+    if (!/^[1-9\.]+$/.test(puzzleString)) {
+      return { error: 'Invalid characters in puzzle' }
+    }
+    return true;
   }
 
   checkRowPlacement(puzzleString, row, column, value) {
-    //console.log(`this.convertRowToNum(row) * 9 + column: ${this.convertRowToNum(row) * 9 + column}`);
-    //console.log(`puzzleString: ${this.convertRowToNum(row) * 9 + column == value}`);
-    //console.log(`puzzleString: ${puzzleString[this.convertRowToNum(row) * 9 + column] == value}`);
-
     if (puzzleString[this.convertRowToNum(row) * 9 + column] == value) {
       return true;
     }
@@ -30,19 +32,16 @@ class SudokuSolver {
     const rowEnd = rowStart + 9;
 
     const rowValues = puzzleString.slice(rowStart, rowEnd).split('');
-    // console.log(`row: ${row}, column: ${column}, value: ${value}, rowStart: ${rowStart} ,rowValues: ${rowValues}`);
-    //console.log(`row: ${typeof(row)}, column: ${typeof(column)}, value: ${typeof(value)}, rowStart: ${typeof(rowStart)} ,rowValues: ${Array.isArray(rowValues)}`);
-    //console.log(`value: ${value} ,rowValues: ${rowValues} ---- includes: ${rowValues.includes(value.toString())}`);
     return !rowValues.includes(value.toString());
   }
 
   checkColPlacement(puzzleString, row, column, value) {
-    if (puzzleString[this.convertRowToNum(row) * 9 + column] === value) {
+    if (puzzleString[this.convertRowToNum(row) * 9 + column] == value) {
       return true;
     }
 
-    for (let i = column - 1; i < 81; i += 9) {
-      if (puzzleString[i] === value) {
+    for (let i = column; i < 81; i += 9) {
+      if (puzzleString[i] == value) {
         return false;
       }
     }
@@ -50,15 +49,15 @@ class SudokuSolver {
   }
 
   checkRegionPlacement(puzzleString, row, column, value) {
-    if (puzzleString[this.convertRowToNum(row) * 9 + column] === value) {
+    if (puzzleString[this.convertRowToNum(row) * 9 + column] == value) {
       return true;
     }
 
-    const startRow = Math.floor(this.convertRowToNum[row] / 3) * 3;
-    const startCol = Math.floor(column -1 / 3) * 3;
+    const startRow = Math.floor(this.convertRowToNum(row) / 3) * 3;
+    const startCol = Math.floor(column / 3) * 3;
     for (let i = startRow; i < startRow + 3; i++) {
       for (let j = startCol; j < startCol + 3; j++) {
-        if (puzzleString[i * 9 + j] === value) {
+        if (puzzleString[i * 9 + j] == value) {
           return false;
         }
       }
@@ -67,8 +66,9 @@ class SudokuSolver {
   }
 
   solve(puzzleString) {
-    if (!this.validate(puzzleString)) {
-      return { error: 'Invalid puzzle' };
+      const validationResult = this.validate(puzzleString);
+    if (typeof validationResult === 'object' && validationResult.error) {
+      return validationResult;
     }
 
     const solvedString = this.solvePuzzle(puzzleString);
@@ -90,13 +90,15 @@ class SudokuSolver {
     const col = emptyIndex % 9;
 
     for (let i = 1; i <= 9; i++) {
-      // const valString = value.toString();
-      if (this.checkRowPlacement(puzzleArray.join(''), row, col, i) &&
-          this.checkColPlacement(puzzleArray.join(''), row, col, i) &&
-          this.checkRegionPlacement(puzzleArray.join(''), row, col, i))
+
+      if (this.checkRowPlacement(puzzleString, row, col, i) &&
+          this.checkColPlacement(puzzleString, row, col, i) &&
+          this.checkRegionPlacement(puzzleString, row, col, i)
+          )
       {
         puzzleArray[emptyIndex] = i;
         const result = this.solvePuzzle(puzzleArray.join(''));
+
         if (result) {
           return result;
         }

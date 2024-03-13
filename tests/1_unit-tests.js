@@ -17,12 +17,12 @@ suite('Unit Tests', () => {
 
   test('Logic handles a puzzle string with invalid characters (not 1-9 or .)', () => {
     let puzzle = puzzles.puzzlesAndSolutions[0][0].replace(/^.{2}/g, 'AB');
-    assert.isFalse(solver.validate(puzzle));
+    assert.equal(solver.validate(puzzle).error, 'Invalid characters in puzzle');
   });
 
   test('Logic handles a puzzle string that is not 81 characters in length', () => {
     let puzzle = puzzles.puzzlesAndSolutions[0][0].substring(0,15);
-    assert.isFalse(solver.validate(puzzle));
+    assert.equal(solver.validate(puzzle).error, 'Expected puzzle to be 81 characters long');
   });
 
   test('Logic handles a valid row placement', () => {
@@ -64,6 +64,7 @@ suite('Unit Tests', () => {
   test('Invalid puzzle strings fail the solver', () => {
     let puzzle = puzzles.puzzlesAndSolutions[0][0].replace(/^.{2}/g, 'AB');
     let result = solver.solve(puzzle);
+//    console.log(`result: ${result.solution}`);
     assert.property(result, 'error');
   });
 
@@ -71,10 +72,6 @@ suite('Unit Tests', () => {
     let puzzle = puzzles.puzzlesAndSolutions[0][0]
     let result = solver.solve(puzzle);
     assert.equal(result.solution, puzzles.puzzlesAndSolutions[0][1]);
-
-    // const solution = result.solution;
-    // assert.isTrue(solver.validate(solution));
-    // assert.notEqual(puzzle, solution);
   });
 
 });
