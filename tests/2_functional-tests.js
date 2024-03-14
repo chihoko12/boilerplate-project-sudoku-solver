@@ -136,7 +136,7 @@ suite('Functional Tests', () => {
       .end((err, res) => {
         assert.equal(res.status, 200);
         assert.property(res.body, 'error');
-        assert.lengthOf(res.body.error, 'Required field(s) missing');
+        assert.equal(res.body.error, 'Required field(s) missing');
         done();
       });
   });
@@ -180,11 +180,12 @@ suite('Functional Tests', () => {
   test('Check a puzzle placement with invalid placement value: POST request to /api/check', (done) => {
     let puzzle = puzzles.puzzlesAndSolutions[0][0];
     chai.request(server)
-      .post('/api/solve')
-      .send({ puzzle: puzzle, coordinate: 'e5', value: 'test' })
+      .post('/api/check')
+      .send({ puzzle: puzzle, coordinate: 'e5', value: '30' })
       .end((err, res) => {
         assert.equal(res.status, 200);
         assert.property(res.body, 'error');
+        assert.equal(res.body.error, 'Invalid value');
         done();
       });
   });

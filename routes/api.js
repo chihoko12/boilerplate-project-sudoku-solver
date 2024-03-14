@@ -29,13 +29,14 @@ module.exports = function (app) {
       const val = parseInt(value);
 
       let errors = [];
+
       if (!solver.checkRowPlacement(puzzle,row,col,val)) {
         errors.push("row");
       }
-      if (solver.checkColPlacement(puzzle, row, col, val)) {
+      if (!solver.checkColPlacement(puzzle, row, col, val)) {
         errors.push("column");
       }
-      if (solver.checkRegionPlacement(puzzle,row,col,val)) {
+      if (!solver.checkRegionPlacement(puzzle,row,col,val)) {
         errors.push("region");
       }
 
